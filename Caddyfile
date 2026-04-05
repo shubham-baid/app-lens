@@ -1,0 +1,12 @@
+{
+  email {$ACME_EMAIL:admin@example.com}
+}
+
+{$DOMAIN:localhost} {
+  route /api/* {
+    uri strip_prefix /api
+    reverse_proxy applens-backend:8000
+  }
+
+  reverse_proxy applens-frontend:3000
+}
