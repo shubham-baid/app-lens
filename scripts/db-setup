@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Wait for Postgres to be ready, then run Alembic migrations.
+# Safe to run after a fresh `./scripts/start` or after schema changes.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+if [ ! -f .env ]; then
+  echo "ERROR: .env not found. Run ./scripts/bootstrap first." >&2
+  exit 1
+fi
+
+# Ensure postgres container is up
+echo "Starting postgres (if not already running)..."
+docker compose up -d postgres
+
+# Wait for postgres to accept connections
+echo "Waiting for postgres to be ready..."
+MAX_RETRIES=30
+RETRY=0
+until docker compose exec -T postgres pg_isready -U "${POSTGRES_USER:-applens}" > /dev/null 2>&1; do
+  RETRY=$((RETRY + 1))
+  if [ "$RETRY" -ge "$MAX_RETRIES" ]; then
+    echo "ERROR: postgres did not become ready in time." >&2
+    exit 1
+  fi
+  sleep 2
+done
+echo "Postgres is ready."
+
+# Run Alembic migrations inside the backend container
+echo ""
+echo "Running database migrations..."
+docker compose exec -T backend alembic upgrade head
+
+echo ""
+echo "Database is up to date."

@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# Start all AppLens services (local development stack).
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+if [ ! -f .env ]; then
+  echo "ERROR: .env not found. Run ./scripts/bootstrap first." >&2
+  exit 1
+fi
+
+echo "Building and starting services..."
+docker compose up --build -d
+
+echo ""
+echo "Waiting for services to be ready..."
+sleep 8
+
+echo ""
+echo "Service status:"
+docker compose ps
+
+echo ""
+echo "AppLens is running"
+echo ""
+echo "  Frontend:   http://localhost:3000"
+echo "  Backend:    http://localhost:8000"
+echo "  API docs:   http://localhost:8000/docs"
+echo ""
+echo "To follow logs:  ./scripts/logs"
+echo "To stop:         ./scripts/stop"

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Stop all AppLens services and remove containers.
+# Volumes are preserved by default; use --volumes to also remove them.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT"
+
+if [[ "${1:-}" == "--volumes" ]]; then
+  echo "Stopping services and removing volumes..."
+  docker compose down --volumes
+else
+  echo "Stopping services..."
+  docker compose down
+fi
+
+echo "Done."
