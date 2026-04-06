@@ -35,3 +35,35 @@ async def get_github_user(access_token: str) -> Optional[dict]:
         if response.status_code == 200:
             return response.json()
     return None
+
+
+async def get_github_user_repos(access_token: str, username: Optional[str] = None) -> list[dict]:
+    """Fetch repositories visible to the authenticated user."""
+    url = "https://api.github.com/user/repos"
+    if username:
+        url = f"https://api.github.com/users/{username}/repos"
+
+    repos: list[dict] = []
+    page = 1
+
+    async with httpx.AsyncClient() as client:
+        while True:
+            response = await client.get(
+                url,
+                headers={
+                    "Authorization": f"token {access_token}",
+                    "Accept": "application/vnd.github.v3+json",
+                },
+                params={"page": page, "per_page": 100, "type": "all", "sort": "updated"},
+            )
+            if response.status_code != 200:
+                break
+
+            page_repos = response.json()
+            if not page_repos:
+                break
+
+            repos.extend(page_repos)
+            page += 1
+
+    return repos

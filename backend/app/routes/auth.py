@@ -95,5 +95,19 @@ async def get_current_user_info(request: Request):
 async def logout(response: Response):
     """Clear authentication cookie to log out user."""
     response = Response()
-    response.delete_cookie(key="applens_token", path="/")
+    response.delete_cookie(
+        key="applens_token",
+        path="/",
+        secure=settings.environment == "production",
+        httponly=True,
+        samesite="lax",
+    )
+    # Defensive clear for clients that may have stored a narrower path cookie.
+    response.delete_cookie(
+        key="applens_token",
+        path="/auth",
+        secure=settings.environment == "production",
+        httponly=True,
+        samesite="lax",
+    )
     return response
