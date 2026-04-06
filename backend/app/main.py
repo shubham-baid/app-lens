@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.config import settings
-from app.db.base import Base, engine
+from app.db import models  # noqa: F401
 
 logging.basicConfig(
     level=logging.INFO,
@@ -36,13 +36,7 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup() -> None:
     logger.info("AppLens backend starting (environment=%s)", settings.environment)
-    try:
-        # Keep startup resilient before Alembic revisions are introduced.
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.create_all)
-        logger.info("Database metadata initialization completed")
-    except Exception as exc:  # noqa: BLE001
-        logger.warning("Database initialization skipped: %s", exc)
+    logger.info("Database schema is managed via Alembic migrations")
 
 
 @app.get("/health", tags=["ops"])
