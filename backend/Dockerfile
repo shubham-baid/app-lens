@@ -21,6 +21,8 @@ COPY pyproject.toml poetry.lock* ./
 RUN poetry install --only main --no-root
 
 COPY app/ ./app/
+COPY alembic/ ./alembic/
+COPY alembic.ini ./
 
 
 ############## Runtime: minimal image ##############
@@ -37,6 +39,8 @@ WORKDIR /app
 
 COPY --from=builder --chown=appuser:app /app/.venv /app/.venv
 COPY --from=builder --chown=appuser:app /app/app /app/app
+COPY --from=builder --chown=appuser:app /app/alembic /app/alembic
+COPY --from=builder --chown=appuser:app /app/alembic.ini /app/alembic.ini
 
 EXPOSE 8000
 
