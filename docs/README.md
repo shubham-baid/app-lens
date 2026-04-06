@@ -1,11 +1,10 @@
 # Docs
 
-This directory stores project documentation for setup, environment configuration, architecture, operations, and releases.
+Project documentation for setup, architecture, operations, and releases.
 
-## Documentation Scope
+## Contents
 
-- local setup and onboarding
-- environment variables and runtime configuration
-- architecture decisions and system diagrams
-- troubleshooting and incident playbooks
-- release notes and deployment guidance
+| Document | Description |
+|---|---|
+| [quickstart.md](quickstart.md) | Get AppLens running locally — prerequisites, bootstrap, login |
+| [architecture.md](architecture.md) | System overview, component responsibilities, data flows, design decisions |
