@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.db import models  # noqa: F401
+from app.routes import auth, repos, scan, graph, chat, nlq
 
 logging.basicConfig(
     level=logging.INFO,
@@ -31,6 +32,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Route inclusion
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(repos.router, prefix="/repos", tags=["repos"])
+app.include_router(scan.router, prefix="/scan", tags=["scan"])
+app.include_router(graph.router, prefix="/graph", tags=["graph"])
+app.include_router(chat.router, prefix="/chat", tags=["chat"])
+app.include_router(nlq.router, prefix="/nlq", tags=["nlq"])
 
 
 @app.on_event("startup")
